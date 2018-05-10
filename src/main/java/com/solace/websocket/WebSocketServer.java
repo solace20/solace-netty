@@ -42,6 +42,9 @@ public class WebSocketServer {
             channel.closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }finally {
+            boosGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
         }
     }
 }

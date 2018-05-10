@@ -1,6 +1,7 @@
 package com.solace.websocket;
 
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
@@ -22,10 +23,15 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
      */
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
-        socketChannel.pipeline().addLast("http-codec",new HttpServerCodec())
-                .addLast("aggregator", new HttpObjectAggregator(65536))//将HTTP消息的多个部分合成一条完整的HTTP消息
-                .addLast("http-chunked",new ChunkedWriteHandler())//向客户端发送HTML5文件
-                .addLast("handle",new WebSocketServerHandle());
+        ChannelPipeline pipeline = socketChannel.pipeline();
+        pipeline.addLast("http-codec",
+                new HttpServerCodec());
+        pipeline.addLast("aggregator",
+                new HttpObjectAggregator(65536));
+        socketChannel.pipeline().addLast("http-chunked",
+                new ChunkedWriteHandler());
+        pipeline.addLast("handler",
+                new WebSocketServerHandle());
 
     }
 }
