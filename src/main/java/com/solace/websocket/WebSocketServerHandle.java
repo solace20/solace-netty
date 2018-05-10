@@ -2,13 +2,13 @@ package com.solace.websocket;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +26,8 @@ public class WebSocketServerHandle extends SimpleChannelInboundHandler<Object>{
 
     private WebSocketServerHandshaker handshaker;
 
+    private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
     /**
      * 第一次链接进来，是以http形式，然后对协议进行转换
      * @param channelHandlerContext
@@ -42,6 +44,50 @@ public class WebSocketServerHandle extends SimpleChannelInboundHandler<Object>{
         else if (o instanceof WebSocketFrame) {
             handleWebSocketFrame(channelHandlerContext, (WebSocketFrame) o);
         }
+    }
+
+    /**
+     * 新客户端接入
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        Channel incoming = ctx.channel();
+        for (Channel channel : channels){
+            channel.writeAndFlush(new TextWebSocketFrame("[SERVER] - " + incoming.remoteAddress() + " 加入"));
+        }
+        channels.add(incoming);
+        System.out.println("Client:"+incoming.remoteAddress() +"加入");
+    }
+
+    /**
+     * 客户端断开连接
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {  // (3)
+        Channel incoming = ctx.channel();
+        for (Channel channel : channels) {
+            channel.writeAndFlush(new TextWebSocketFrame("[SERVER] - " + incoming.remoteAddress() + " 离开"));
+        }
+        System.out.println("Client:"+incoming.remoteAddress() +"离开");
+        channels.remove(ctx.channel());
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        Channel incoming = ctx.channel();
+        System.out.println("Client:"+incoming.remoteAddress()+"在线");
+    }
+
+
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel incoming = ctx.channel();
+        System.out.println("Client:"+incoming.remoteAddress()+"掉线");
     }
 
     /**

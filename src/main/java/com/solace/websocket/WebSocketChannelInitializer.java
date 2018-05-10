@@ -16,6 +16,8 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * @CopyRight lengbar.cn
  */
 public class WebSocketChannelInitializer extends ChannelInitializer<SocketChannel>{
+
+
     /**
      * 初始化设置channel
      * @param socketChannel
