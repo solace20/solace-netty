@@ -1,7 +1,10 @@
 package com.solace.bean;
 
+import com.solace.common.Constant;
+import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +22,20 @@ public class ServiceRegistry {
     @Value("${netty.rpc.registryAddress}")
     private String registryAddress;
 
-    public ServiceRegistry(String registryAddress){
-        this.registryAddress = registryAddress;
+    @Autowired(required = false)
+    private ZookeeperClientUtil zookeeperClientUtil;
+
+    public ServiceRegistry(){
+
+    }
+
+    public void register(String data){
+        if (data!=null){
+            ZooKeeper zk = zookeeperClientUtil.getAliveZk();
+            if (zk!=null){
+                zookeeperClientUtil.addRootNode(Constant.ZK_REGISTRY_PATH);
+                zookeeperClientUtil.createNode(data);
+            }
+        }
     }
 }
