@@ -144,9 +144,9 @@ public class WebSocketServerHandle extends SimpleChannelInboundHandler<Object>{
      * @param request
      */
     public void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest request){
-        if (!request.decoderResult().isSuccess()||(!"websocket".equals(request.headers().get("Upgrade")))){
-            sendHttpResponse(ctx,request,new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.BAD_REQUEST));
-        }
+//        if (!request.decoderResult().isSuccess()||(!"websocket".equals(request.headers().get("Upgrade")))){
+//            sendHttpResponse(ctx,request,new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.BAD_REQUEST));
+//        }
         WebSocketServerHandshakerFactory factory = new WebSocketServerHandshakerFactory("ws://localhost:8080/websocket",null,false);
         handshaker = factory.newHandshaker(request);
         if (handshaker == null) {
@@ -164,16 +164,16 @@ public class WebSocketServerHandle extends SimpleChannelInboundHandler<Object>{
      * @param response
      */
     public void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest request, FullHttpResponse response){
-        if (response.getStatus().code()!=200){
-            ByteBuf buf  = Unpooled.copiedBuffer(response.getStatus().toString(), CharsetUtil.UTF_8);
-            response.content().writeBytes(buf);
-            buf.release();
-            HttpUtil.setContentLength(response,response.content().readableBytes());
-        }
-        ChannelFuture future = ctx.channel().writeAndFlush(response);
-        if (!HttpUtil.isKeepAlive(request)||response.status().code() != 200){
-            future.addListener(ChannelFutureListener.CLOSE);
-        }
+//        if (response.getStatus().code()!=200){
+//            ByteBuf buf  = Unpooled.copiedBuffer(response.getStatus().toString(), CharsetUtil.UTF_8);
+//            response.content().writeBytes(buf);
+//            buf.release();
+//            HttpUtil.setContentLength(response,response.content().readableBytes());
+//        }
+//        ChannelFuture future = ctx.channel().writeAndFlush(response);
+//        if (!HttpUtil.isKeepAlive(request)||response.status().code() != 200){
+//            future.addListener(ChannelFutureListener.CLOSE);
+//        }
     }
 
     /**

@@ -38,7 +38,14 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest>{
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        logger.info("client disconnect:{}",ctx.channel().remoteAddress());
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcRequest rpcRequest) throws Exception {
+        logger.info("received request from{}"+rpcRequest);
         RpcServer.submit(new Runnable() {
             @Override
             public void run() {
