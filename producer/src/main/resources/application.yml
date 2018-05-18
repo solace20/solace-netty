@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: env
+netty:
+  rpc:
+    serverAddress: 127.0.0.1:10086
+    registryAddress: 127.0.0.1:2181
+    sessionTimeOut: 40000
+server:
+  port: 8999
