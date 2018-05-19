@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -49,9 +50,9 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest>{
         RpcServer.submit(new Runnable() {
             @Override
             public void run() {
-                logger.debug("receive request:"+rpcRequest.getRequestId());
+                logger.info("receive request:"+rpcRequest.getRequestId());
                 RpcResponse response = new RpcResponse();
-                response.setRequestId(response.getRequestId());
+                response.setRequestId(rpcRequest.getRequestId());
                 try {
                     Object result = handle(rpcRequest);
                     response.setResult(result);
@@ -59,6 +60,10 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest>{
                     //e.printStackTrace();
                     response.setError(e.toString());
                     logger.error("RpcServer handle request error");
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
                 }
                 channelHandlerContext.writeAndFlush(response).addListener(new ChannelFutureListener() {
                     @Override
@@ -76,7 +81,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest>{
      * @return
      * @throws InvocationTargetException
      */
-    private Object handle(RpcRequest request) throws InvocationTargetException {
+    private Object handle(RpcRequest request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         String className = request.getClassName();
         Object serviceBean = handleMap.get(className);
 
@@ -87,9 +92,12 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest>{
         logger.debug(serviceClass.getName());
         logger.debug(methodName);
         //通过cglib反射调用方法
-        FastClass serviceFastClass = FastClass.create(serviceClass);
-        FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName,parameterTypes);
-        return serviceFastMethod.invoke(serviceClass,parameters);
+//        FastClass serviceFastClass = FastClass.create(serviceClass);
+//        FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName,parameterTypes);
+//        return serviceFastMethod.invoke(serviceClass,parameters);
+        Method method = serviceClass.getMethod(methodName, parameterTypes);
+        method.setAccessible(true);
+        return method.invoke(serviceBean, parameters);
     }
 
     @Override

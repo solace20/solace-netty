@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://D:\workspace\solace-netty\common\common.iml" filepath="D:\workspace\solace-netty\common\common.iml" />
       <module fileurl="file://$PROJECT_DIR$/consumer/consumer.iml" filepath="$PROJECT_DIR$/consumer/consumer.iml" />
+      <module fileurl="file://D:\workspace\solace-netty\consumer\consumer.iml" filepath="D:\workspace\solace-netty\consumer\consumer.iml" />
       <module fileurl="file://$PROJECT_DIR$/producer/producer.iml" filepath="$PROJECT_DIR$/producer/producer.iml" />
+      <module fileurl="file://D:\workspace\solace-netty\producer\producer.iml" filepath="D:\workspace\solace-netty\producer\producer.iml" />
       <module fileurl="file://$PROJECT_DIR$/solace-netty.iml" filepath="$PROJECT_DIR$/solace-netty.iml" />
     </modules>
   </component>
